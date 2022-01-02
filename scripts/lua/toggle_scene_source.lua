@@ -103,17 +103,13 @@ function script_defaults(settings)
 	OBS_SETTINGS = settings
 end
 
-function script_save(settings)
-
-end
-
 function script_load(settings)
     MY_SETTINGS = DEFAULT_SETTINGS
 	OBS_SETTINGS = settings
 end
 
 function script_unload()
-    activate(false)
+    
 end
 
 -- CORE FUNCTIONS [All of the functions defined to "do things" other than script management]
@@ -260,8 +256,7 @@ function activate(activating)
                 start_timer()
             end
         else
-            toggle_source(MY_SETTINGS.start_visible)
-            return nil
+            return
         end
 	end
 end
