@@ -5,7 +5,7 @@ SCRIPT_NAME = "Toggle Scene Source"
 SCRIPT_AUTHOR = "BillyJBryant"
 SCRIPT_AUTHOR_URL = "https://github.com/billyjbryant"
 SCRIPT_VERSION = '0.0.1'
-SCRIPT_SOURCE_URL = "https://github.com/billyjbryant/obs-artifacts/scripts/lua/toggle_scene_source.lua"
+SCRIPT_SOURCE_URL = "https://github.com/billyjbryant/obs-artifacts/blob/main/scripts/lua/toggle_scene_source.lua"
 SCRIPT_ISSUES_URL = "https://github.com/billyjbryant/obs-artifacts/issues"
 
 -- Establish Default Global Variables
