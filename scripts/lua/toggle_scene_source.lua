@@ -37,7 +37,7 @@ MY_SETTINGS = {}
 OBS_SETTINGS = nil
 SOURCE_LIST_VISIBLE = nil
 REPEATED = 0
-DEBUG = true
+DEBUG = false
 
 -- Setup the Script's Primary Functions
 function script_properties()
