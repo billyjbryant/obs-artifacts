@@ -1,18 +1,5 @@
 OBS         = obslua
 
-function dump(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
-end
-
 -- Script Metadata
 SCRIPT_NAME = "Toggle Scene Source"
 SCRIPT_AUTHOR = "BillyJBryant"
@@ -20,8 +7,6 @@ SCRIPT_AUTHOR_URL = "https://github.com/billyjbryant"
 SCRIPT_VERSION = '0.0.3'
 SCRIPT_SOURCE_URL = "https://github.com/billyjbryant/obs-artifacts/blob/main/scripts/lua/toggle_scene_source.lua"
 SCRIPT_ISSUES_URL = "https://github.com/billyjbryant/obs-artifacts/issues"
-
-PROPS = nil
 
 -- Establish Default Global Variables
 DEFAULT_SETTINGS = {
@@ -56,11 +41,11 @@ DEBUG = false
 
 -- Setup the Script's Primary Functions
 function script_properties()
-	PROPS = OBS.obs_properties_create()
+	props = OBS.obs_properties_create()
 
     -- Sets up the Source Selection Group
 	local sprops = OBS.obs_properties_create()
-    OBS.obs_properties_add_group(PROPS, "source_group", "Source Selection", OBS.OBS_GROUP_NORMAL, sprops)
+    OBS.obs_properties_add_group(props, "source_group", "Source Selection", OBS.OBS_GROUP_NORMAL, sprops)
 	local scene_list = OBS.obs_properties_add_list(sprops, "scene", "Scene", OBS.OBS_COMBO_TYPE_LIST, OBS.OBS_COMBO_FORMAT_STRING)
     local scenes = OBS.obs_frontend_get_scenes()
 	if scenes ~= nil then
@@ -76,7 +61,7 @@ function script_properties()
 
 	local source_list = OBS.obs_properties_add_list(sprops, "source_list", "Sources", OBS.OBS_COMBO_TYPE_LIST, OBS.OBS_COMBO_FORMAT_STRING)
     local source_field = OBS.obs_properties_add_text(sprops, "source", "Source", OBS.OBS_TEXT_DEFAULT)
-    OBS.obs_properties_add_button(sprops, "refresh_sources", "Refresh list of Sources in Scene", function() get_sources_from_scene(PROPS, scene_list, OBS_SETTINGS) return true end)
+    OBS.obs_properties_add_button(sprops, "refresh_sources", "Refresh list of Sources in Scene", function() get_sources_from_scene(props, scene_list, OBS_SETTINGS) return true end)
     OBS.obs_property_set_enabled(source_field, false)
 
     function source_list_visible() if MY_SETTINGS.source ~= nil and MY_SETTINGS.source ~= '' then return true else return false end end
@@ -84,7 +69,7 @@ function script_properties()
 
     -- Sets up the Visibility & Timing Group
 	local vprops = OBS.obs_properties_create()
-    OBS.obs_properties_add_group(PROPS, "visual_group", "Visibility and Timing", OBS.OBS_GROUP_NORMAL, vprops)
+    OBS.obs_properties_add_group(props, "visual_group", "Visibility and Timing", OBS.OBS_GROUP_NORMAL, vprops)
 	OBS.obs_properties_add_float_slider(vprops, "delay", "Delay after Activating (seconds)", 0, 600, 0.5)
 	OBS.obs_properties_add_float_slider(vprops, "duration_show", "Duration to Show (seconds)", 1, 1800, 0.5)
 	OBS.obs_properties_add_float_slider(vprops, "duration_hide", "Duration to Hide (seconds)", 1, 1800, 0.5)
@@ -92,7 +77,7 @@ function script_properties()
 
     -- Sets up the Transition Override Group
 	local tprops = OBS.obs_properties_create()
-    local transition_group = OBS.obs_properties_add_group(PROPS, "transition_group", "Transition Override", OBS.OBS_GROUP_NORMAL, tprops)
+    local transition_group = OBS.obs_properties_add_group(props, "transition_group", "Transition Override", OBS.OBS_GROUP_NORMAL, tprops)
     local transition_override = OBS.obs_properties_add_bool(tprops, "transition_override", "Do you want to override the Source Transition?")
 	local hide_list = OBS.obs_properties_add_list(tprops, "transition_hide", "Hide Transition", OBS.OBS_COMBO_TYPE_LIST, OBS.OBS_COMBO_FORMAT_STRING)
 	OBS.obs_properties_add_float_slider(tprops, "transition_hide_duration", "Duration for Hide Effect (s)", 1, 10, 0.5)
@@ -115,7 +100,7 @@ function script_properties()
 
     -- Sets up the Repeat Options Group
 	local rprops = OBS.obs_properties_create()
-    OBS.obs_properties_add_group(PROPS, "repeat_group", "Repeat Options", OBS.OBS_GROUP_NORMAL, rprops)
+    OBS.obs_properties_add_group(props, "repeat_group", "Repeat Options", OBS.OBS_GROUP_NORMAL, rprops)
 	local repeat_times = OBS.obs_properties_add_int_slider(rprops, "repeat_times", "Number of Times to Repeat (0 = Infinite)", 0, 100, 1)
     local repeat_reset = OBS.obs_properties_add_bool(rprops, "repeat_reset", "Should we reset the cycle after a certain amount of time?")
     OBS.obs_properties_add_int_slider(rprops, "repeat_reset_after", "Maximum Duration Elapsed to Reset Repeat (minutes)", 1, 60, 1)
@@ -128,9 +113,9 @@ function script_properties()
 	OBS.obs_property_set_modified_callback(repeat_reset, settings_updated)
 
     -- Run some cleanup options when settings are updated
-    settings_updated(PROPS, nil, OBS_SETTINGS)
+    settings_updated(props, nil, OBS_SETTINGS)
 
-	return PROPS
+	return props
 end
 
 function script_description()
