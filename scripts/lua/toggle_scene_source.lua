@@ -65,10 +65,10 @@ function script_properties()
     local scenes = OBS.obs_frontend_get_scenes()
 	if scenes ~= nil then
         OBS.obs_property_list_add_string(scene_list, "", nil)
-        console.log("Found the following Scenes: " .. dump(scenes))
+        console.debug("Found the following Scenes: " .. dump(scenes))
 		for _, scene in ipairs(scenes) do
 			local name = OBS.obs_source_get_name(scene)
-            console.log("Added Scene [" .. name .. "] to the Scene List")
+            console.debug("Added Scene [" .. name .. "] to the Scene List")
 			OBS.obs_property_list_add_string(scene_list, name, name)
 		end
         OBS.source_list_release(scenes)
@@ -102,10 +102,10 @@ function script_properties()
     if transitions ~= nil then
         OBS.obs_property_list_add_string(hide_list, "", nil)
         OBS.obs_property_list_add_string(show_list, "", nil)
-        console.log("Found the following Transition Types: " .. dump(transitions))
+        console.debug("Found the following Transition Types: " .. dump(transitions))
         for _, transition in ipairs(transitions) do
 			local name = OBS.obs_source_get_name(transition)
-            console.log("Added Transition [" .. name .. "] to the Transition Lists")
+            console.debug("Added Transition [" .. name .. "] to the Transition Lists")
 			OBS.obs_property_list_add_string(hide_list, name, name)
 			OBS.obs_property_list_add_string(show_list, name, name)
 		end
@@ -203,17 +203,17 @@ function get_sources_from_scene(props, prop, settings)
     OBS.obs_property_list_clear(source_list)
     
     if scene_name ~= "" and scene_name ~= nil then
-        console.log("Scene Name was set to [" .. scene_name .. "]")
+        console.debug("Scene Name was set to [" .. scene_name .. "]")
         local scene = get_scene_by_name(scene_name)
         local scene_items = OBS.obs_scene_enum_items(scene)
-        console.log("Found the following SceneItems: " .. dump(scene_items))
+        console.debug("Found the following SceneItems: " .. dump(scene_items))
         if scene_items ~= nil then
             OBS.obs_property_list_add_string(source_list, "", nil)
             for _, scene_item in ipairs(scene_items) do
                 local source = OBS.obs_sceneitem_get_source(scene_item)
                 local name = OBS.obs_source_get_name(source)
                 OBS.obs_property_list_add_string(source_list, name, name)
-                console.log("Added Source [" .. name .. "] to the Source List")
+                console.debug("Added Source [" .. name .. "] to the Source List")
             end
             show_source_list(props, true)
         end
@@ -233,17 +233,17 @@ end
 function update_source_from_list(props, prop, settings)
     local stored_source = MY_SETTINGS.source
     local source_updated_to = OBS.obs_data_get_string(settings, "source_list")
-    console.log(stored_source .. ' - ' .. source_updated_to)
+    console.debug(stored_source .. ' - ' .. source_updated_to)
     if source_updated_to ~= nil and source_updated_to ~= "" then
         if (stored_source == source_updated_to) and (stored_source ~= "" and stored_source ~= nil) then
-            console.log("Nothing changed, so we are hiding the source list")
+            console.debug("Nothing changed, so we are hiding the source list")
             show_source_list(props, false)
             activate(true)
             return true
         else
             local scene_name = OBS.obs_data_get_string(settings, "scene")
             local scene_item = get_sceneitem_by_name(scene_name, source_updated_to)
-            console.log("Source updated from [" .. stored_source .. "] to [" .. source_updated_to .. "]")
+            console.debug("Source updated from [" .. stored_source .. "] to [" .. source_updated_to .. "]")
             OBS.obs_data_set_string(settings, "source", source_updated_to)
             show_source_list(props, false)
             MY_SETTINGS.source = source_updated_to
@@ -270,14 +270,14 @@ function toggle_source(hidden)
         local is_visible = OBS.obs_sceneitem_visible(scene_item)
         if hidden ~= nil then is_visible = not hidden end
         OBS.obs_sceneitem_set_visible(scene_item, not is_visible)
-        console.log(MY_SETTINGS.scene .. ":" .. MY_SETTINGS.source .. " is now visible: " .. dump(not is_visible))
+        console.debug(MY_SETTINGS.scene .. ":" .. MY_SETTINGS.source .. " is now visible: " .. dump(not is_visible))
         return not is_visible
     end
     return nil
 end
 
 function settings_updated(props, prop, settings)
-    console.log("The settings have been updated..")
+    console.debug("The settings have been updated..")
     local rprops = OBS.obs_properties_get(props, "repeat_group")
     rprops = OBS.obs_property_group_content(rprops)
     local repeat_enabled = MY_SETTINGS.repeat_.times ~= 0
@@ -296,7 +296,7 @@ end
 
 function create_timer(target, delay)
     local timer = OBS.timer_add(target, delay)
-    console.log("Created timer [".. dump(timer) .. "] for " .. delay .. " milliseconds")
+    console.debug("Created timer [".. dump(timer) .. "] for " .. delay .. " milliseconds")
     return timer
 end
 
@@ -327,7 +327,7 @@ function reset_repeats()
     if MY_SETTINGS.repeat_.reset then
         local REPEATED_old = REPEATED
         REPEATED = 0
-        console.log("Reset repeated counter to 0")
+        console.debug("Reset repeated counter to 0")
         OBS.timer_remove(reset_repeats)
         repeat_source()
     end
