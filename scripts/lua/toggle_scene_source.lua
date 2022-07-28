@@ -4,7 +4,7 @@ OBS         = obslua
 SCRIPT_NAME = "Toggle Scene Source"
 SCRIPT_AUTHOR = "BillyJBryant"
 SCRIPT_AUTHOR_URL = "https://github.com/billyjbryant"
-SCRIPT_VERSION = '0.0.2'
+SCRIPT_VERSION = '0.0.3'
 SCRIPT_SOURCE_URL = "https://github.com/billyjbryant/obs-artifacts/blob/main/scripts/lua/toggle_scene_source.lua"
 SCRIPT_ISSUES_URL = "https://github.com/billyjbryant/obs-artifacts/issues"
 
@@ -13,10 +13,10 @@ DEFAULT_SETTINGS = {
     scene = '',
     source = '',
     scene_item = '',
-    delay = 2,
+    delay = 5,
     duration = {
-        show = 5,
-        hide = 2
+        show = 2,
+        hide = 5
     },
     repeat_ = {
         times = 0,
@@ -30,7 +30,7 @@ DEFAULT_SETTINGS = {
         show = nil,
         show_duration = 3
     },
-    start_visible = true,
+    start_visible = false,
     currently_visible = false
 }
 MY_SETTINGS = {}
@@ -41,7 +41,7 @@ DEBUG = false
 
 -- Setup the Script's Primary Functions
 function script_properties()
-	local props = OBS.obs_properties_create()
+	props = OBS.obs_properties_create()
 
     -- Sets up the Source Selection Group
 	local sprops = OBS.obs_properties_create()
@@ -126,6 +126,7 @@ end
 
 function script_update(settings)
     MY_SETTINGS.scene = OBS.obs_data_get_string(settings, "scene")
+    MY_SETTINGS.source = OBS.obs_data_get_string(settings, "source")
     MY_SETTINGS.delay = OBS.obs_data_get_int(settings, "delay")
     MY_SETTINGS.duration.show = OBS.obs_data_get_double(settings, "duration_show")
     MY_SETTINGS.duration.hide = OBS.obs_data_get_double(settings, "duration_hide")
@@ -144,6 +145,7 @@ function script_update(settings)
 end
 
 function script_defaults(settings)
+	OBS.obs_data_set_default_string(settings, "scene", DEFAULT_SETTINGS.source)
 	OBS.obs_data_set_default_string(settings, "source", DEFAULT_SETTINGS.source)
 	OBS.obs_data_set_default_double(settings, "delay", DEFAULT_SETTINGS.delay)
 	OBS.obs_data_set_default_double(settings, "duration_show", DEFAULT_SETTINGS.duration.show) 
@@ -216,6 +218,7 @@ end
 function update_source_from_list(props, prop, settings)
     local stored_source = MY_SETTINGS.source
     local source_updated_to = OBS.obs_data_get_string(settings, "source_list")
+    console.debug(stored_source .. ' - ' .. source_updated_to)
     if source_updated_to ~= nil and source_updated_to ~= "" then
         if (stored_source == source_updated_to) and (stored_source ~= "" and stored_source ~= nil) then
             console.debug("Nothing changed, so we are hiding the source list")
